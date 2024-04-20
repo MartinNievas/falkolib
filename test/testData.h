@@ -20,8 +20,11 @@
 #pragma once
 
 extern double testRanges[];
-
 extern double testRanges2[];
+extern double testRanges3[];
+extern double testRanges4[];
+extern double testRanges5[];
+extern double testRanges6[];
 
 extern double testRangesOrtho1[];
 

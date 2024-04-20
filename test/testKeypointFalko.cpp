@@ -37,25 +37,30 @@ using namespace std;
 using namespace falkolib;
 
 int main(int argc, char** argv) {
+  cout << "Generate scan1" << endl;
+	LaserScan scan1(0.0054827099666, 2.0 * M_PI, 1147);
+	scan1.fromRanges(testRanges3);
+
+  cout << "Generate scan2" << endl;
+	LaserScan scan2(0.0054827099666, 2.0 * M_PI, 1147);
+	scan2.fromRanges(testRanges5);
+
 	FALKOExtractor fe;
-	fe.setMinExtractionRange(1);
-	fe.setMaxExtractionRange(30);
+	fe.setMinExtractionRange(0);
+	fe.setMaxExtractionRange(10);
 	fe.enableSubbeam(true);
-	fe.setNMSRadius(0.1);
+	fe.setNMSRadius(0.05);
 	fe.setNeighB(0.07);
 	fe.setBRatio(2.5);
 	fe.setGridSectors(16);
-
-	LaserScan scan1(-0.003316126, 2.0 * M_PI, 1440);
-	scan1.fromRanges(testRanges);
-	LaserScan scan2(-0.003316126, 2.0 * M_PI, 1440);
-	scan2.fromRanges(testRanges2);
 
 	std::vector<FALKO> keypoints1;
 	std::vector<FALKO> keypoints2;
 
 
+  cout << "Extract keypoints1: " << scan1.ranges.size() << endl;
 	fe.extract(scan1, keypoints1);
+  cout << "Extract keypoints2:" << scan1.ranges.size() << endl;
 	fe.extract(scan2, keypoints2);
 
 	cout << "num keypoints1 extracted: " << keypoints1.size() << endl;
@@ -79,7 +84,7 @@ int main(int argc, char** argv) {
 	
 	cout << endl;
 	NNMatcher<FALKO> matcher;
-	matcher.setDistanceThreshold(0.1);
+	matcher.setDistanceThreshold(1.6);
 	std::vector<std::pair<int, int> > asso;
 	std::cout << "num matching NN: " << matcher.match(keypoints1, keypoints2, asso) << endl;
 	for (auto& match : asso) {
@@ -92,8 +97,8 @@ int main(int argc, char** argv) {
 	
 	cout << endl;
 	NNMatcher<FALKO, BSC> matcherFALKOBSC;
-	matcherFALKOBSC.setDistanceThreshold(0.1);
-	matcherFALKOBSC.setDescriptorThreshold(15);
+	matcherFALKOBSC.setDistanceThreshold(1.1);
+	matcherFALKOBSC.setDescriptorThreshold(30);
 	std::cout << "num matching NN FALKO BSC: " << matcherFALKOBSC.match(keypoints1, bscDesc1, keypoints2, bscDesc2, asso) << endl;
 	for (auto& match : asso) {
 		if (match.second >= 0) {
@@ -129,7 +134,7 @@ int main(int argc, char** argv) {
 	}
 	cout << endl;
 	NNMatcher<CGH> matcherCGH;
-	matcherCGH.setDistanceThreshold(0.2);
+	matcherCGH.setDistanceThreshold(0.4);
 	std::cout << "num matching NN CGH: " << matcherCGH.match(cghDesc1, cghDesc2, asso) << endl;
 	for (auto& match : asso) {
 		if (match.second >= 0) {

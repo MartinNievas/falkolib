@@ -35,25 +35,30 @@ using namespace std;
 using namespace falkolib;
 
 int main(int argc, char** argv) {
-	LaserScan scan1(-0.003316126, 2.0 * M_PI, 1440);
-	scan1.fromRanges(testRanges);
-	LaserScan scan2(-0.003316126, 2.0 * M_PI, 1440);
-	scan2.fromRanges(testRanges2);
+  cout << "Generate scan1" << endl;
+	LaserScan scan1(0.0054827099666, 2.0 * M_PI, 1147);
+	scan1.fromRanges(testRanges3);
+
+  cout << "Generate scan2" << endl;
+	LaserScan scan2(0.0054827099666, 2.0 * M_PI, 1147);
+	scan2.fromRanges(testRanges6);
 
 	FALKOExtractor fe;
 	fe.setMinExtractionRange(0);
-	fe.setMaxExtractionRange(30);
+	fe.setMaxExtractionRange(10);
 	fe.enableSubbeam(true);
-	fe.setNMSRadius(0.1);
+	fe.setNMSRadius(0.05);
 	fe.setNeighB(0.07);
-	fe.setBRatio(2.5);
+	fe.setBRatio(4.0);
 	fe.setGridSectors(16);
 
 	std::vector<FALKO> keypoints1;
 	std::vector<FALKO> keypoints2;
 
 
+  cout << "Extract keypoints1: " << scan1.ranges.size() << endl;
 	fe.extract(scan1, keypoints1);
+  cout << "Extract keypoints2:" << scan1.ranges.size() << endl;
 	fe.extract(scan2, keypoints2);
 
 	cout << "num keypoints1 extracted: " << keypoints1.size() << endl;
@@ -64,27 +69,32 @@ int main(int argc, char** argv) {
 	vector<BSC> bscDesc2;
 
 
-	bsc.compute(scan1, keypoints1, bscDesc1);
-	bsc.compute(scan2, keypoints2, bscDesc2);
-
-
-
+  // cout << "Compute descriptors keypoints1" << endl;
+	// bsc.compute(scan1, keypoints1, bscDesc1);
+  // cout << "Compute descriptors keypoints1" << endl;
+	// bsc.compute(scan2, keypoints2, bscDesc2);
 
 	NNMatcher<FALKO> matcher;
-	matcher.setDistanceThreshold(0.1);
+  // simple Nearest-Neighborhood feature matching engine 
+	matcher.setDistanceThreshold(1.6);
 	std::vector<std::pair<int, int> > assoNN;
 	std::cout << "num matching NN: " << matcher.match(keypoints1, keypoints2, assoNN) << endl;
 	for (auto& match : assoNN) {
 		if (match.second >= 0) {
 			int i1 = match.first;
 			int i2 = match.second;
-			std::cout << "i1: " << i1 << "\ti2: " << i2 << "\t keypoints distance: " << (keypoints1[i1].distance(keypoints2[i2])) << endl;
+      std::cout << "i1: " <<
+        i1 << "\ti2: " <<
+        i2 << "\t keypoints distance: " <<
+        (keypoints1[i1].distance(keypoints2[i2])) <<
+        endl;
 		}
 	}
-
 	cout << endl;
-	AHTMatcher<FALKO> aht(0.01, 0.01, 0.001, 0.2, 0.2, 0.05);
-	aht.setDistanceThreshold(0.1);
+
+	// Affine Hough Transform feature matching engine
+	AHTMatcher<FALKO> aht(0.05, 0.05, 0.001, 0.2, 0.2, 0.05);
+	aht.setDistanceThreshold(0.6);
 	std::vector<std::pair<int, int> > assoAHT;
 	std::cout << "num matching AHT: " << aht.match(keypoints1, keypoints2, assoAHT) << endl;
 	for (auto& match : assoAHT) {

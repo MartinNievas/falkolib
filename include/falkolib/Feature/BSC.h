@@ -42,6 +42,11 @@ namespace falkolib {
 		 * Set the grid dimension and cells resolutions
 		 */
 		BSC(double _radius, int _circularSectorNumber, int _radialRingNumber);
+
+		/**
+		 * @brief Destructor
+		 */
+		virtual ~BSC();
 		
 		/**
 		 * @brief Compute distance between two descriptors

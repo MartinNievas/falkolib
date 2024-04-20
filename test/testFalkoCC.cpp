@@ -35,16 +35,19 @@ using namespace std;
 using namespace falkolib;
 
 int main(int argc, char** argv) {
-	LaserScan scan1(-0.003316126, 2.0 * M_PI, 1440);
-	scan1.fromRanges(testRanges);
-	LaserScan scan2(-0.003316126, 2.0 * M_PI, 1440);
-	scan2.fromRanges(testRanges2);
+  cout << "Generate scan1" << endl;
+	LaserScan scan1(0.0054827099666, 2.0 * M_PI, 1147);
+	scan1.fromRanges(testRanges3);
+
+  cout << "Generate scan2" << endl;
+	LaserScan scan2(0.0054827099666, 2.0 * M_PI, 1147);
+	scan2.fromRanges(testRanges4);
 
 	FALKOExtractor fe;
 	fe.setMinExtractionRange(0);
-	fe.setMaxExtractionRange(30);
+	fe.setMaxExtractionRange(10);
 	fe.enableSubbeam(true);
-	fe.setNMSRadius(0.1);
+	fe.setNMSRadius(0.05);
 	fe.setNeighB(0.07);
 	fe.setBRatio(2.5);
 	fe.setGridSectors(16);
@@ -53,7 +56,9 @@ int main(int argc, char** argv) {
 	std::vector<FALKO> keypoints2;
 
 
+  cout << "Extract keypoints1: " << scan1.ranges.size() << endl;
 	fe.extract(scan1, keypoints1);
+  cout << "Extract keypoints2:" << scan1.ranges.size() << endl;
 	fe.extract(scan2, keypoints2);
 
 	cout << "num keypoints1 extracted: " << keypoints1.size() << endl;
@@ -67,11 +72,8 @@ int main(int argc, char** argv) {
 	bsc.compute(scan1, keypoints1, bscDesc1);
 	bsc.compute(scan2, keypoints2, bscDesc2);
 
-
-
-
 	NNMatcher<FALKO> matcher;
-	matcher.setDistanceThreshold(0.1);
+	matcher.setDistanceThreshold(0.6);
 	std::vector<std::pair<int, int> > assoNN;
 	std::cout << "num matching NN: " << matcher.match(keypoints1, keypoints2, assoNN) << endl;
 	for (auto& match : assoNN) {
@@ -83,9 +85,10 @@ int main(int argc, char** argv) {
 	}
 
 	cout << endl;
+  // This class implements the Combined Constraint Data Association (CCDA)
 	CCDAMatcher<FALKO> cc;
 	cc.setDistMin(0.05);
-	cc.setDistTol(0.1);
+	cc.setDistTol(0.6);
 	std::vector<std::pair<int, int> > assoCC;
 	std::cout << "num matching CC: " << cc.match(keypoints1, keypoints2, assoCC) << endl;
 	for (auto& match : assoCC) {

@@ -36,6 +36,8 @@ namespace falkolib {
 		ringResolution = radius / radialRingNumber;
 	}
 
+	BSC::~BSC() {}
+
 	void BSC::compute(std::vector<Point2d>& neigh, int centralPointIndex) {
 		const int size = neigh.size();
 		grid.resize(radialRingNumber, std::vector<uint8_t>(circularSectorNumber, 0));
